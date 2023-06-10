@@ -2,11 +2,11 @@ package minio
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os"
 	"sync"
 
-	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/tealeg/xlsx"
@@ -15,6 +15,7 @@ import (
 var (
 	client *minio.Client
 	once   sync.Once
+	useSSl = false
 )
 
 func NewClient() (client *minio.Client, err error) {
@@ -36,7 +37,9 @@ func NewClient() (client *minio.Client, err error) {
 	return client, nil
 }
 
-func PushFileToMiniO(ctx *gin.Context, file *xlsx.File) (string, error) {
+func PushFileToMiniO(file *xlsx.File) (string, error) {
+	fmt.Println("---- Pushing file to minio ----")
+
 	var err error
 	var bucketName = "excel"
 	var objectName = "myobject"
@@ -51,7 +54,7 @@ func PushFileToMiniO(ctx *gin.Context, file *xlsx.File) (string, error) {
 	reader := bytes.NewReader(buffer.Bytes())
 	// fileSize := int64(buffer.Len())
 
-	fileInfo, err := client.PutObject(ctx, bucketName, objectName, reader, -1, minio.PutObjectOptions{ContentType: contentType})
+	fileInfo, err := client.PutObject(context.Background(), bucketName, objectName, reader, -1, minio.PutObjectOptions{ContentType: contentType})
 	if err != nil {
 		fmt.Println(err)
 		return "", err

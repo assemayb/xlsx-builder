@@ -20,7 +20,7 @@ func CreateExcelFile(ctx *gin.Context) {
 	}
 
 	file := buildExcel(body.Data, body.Headers, body.Lang, body.SheetName)
-	fileName, err := minioPackage.PushFileToMiniO(ctx, file)
+	fileName, err := minioPackage.PushFileToMiniO(file)
 
 	if err != nil {
 		log.Println(err)
