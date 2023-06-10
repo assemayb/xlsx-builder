@@ -3,13 +3,13 @@ package excelcontroller
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tealeg/xlsx"
 )
 
 func CreateExcelFile(ctx *gin.Context) {
-	log.Println("----- CreateExcelFile ------")
 	var body RequestBody
 	err := ctx.BindJSON(&body)
 	if err != nil {
@@ -20,15 +20,13 @@ func CreateExcelFile(ctx *gin.Context) {
 
 	file := buildExcel(body.Data, body.Headers, body.Lang, body.SheetName)
 	err = file.Save(fmt.Sprintf("%s.xlsx", body.SheetName))
+
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-
-	ctx.JSON(200, gin.H{"message": "success"})
-
-	// buildExcelFile([][]interface{}{}, []HeadersInfo{}, "en", "sheetName")
+	ctx.JSON(http.StatusCreated, gin.H{"message": "success"})
 }
 
 func buildExcel(data [][]interface{}, headers []HeadersInfo, lang string, sheetName string) *xlsx.File {
@@ -37,7 +35,6 @@ func buildExcel(data [][]interface{}, headers []HeadersInfo, lang string, sheetN
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	headerRow := sheet.AddRow()
 	for _, header := range headers {
 		cell := headerRow.AddCell()
@@ -47,7 +44,6 @@ func buildExcel(data [][]interface{}, headers []HeadersInfo, lang string, sheetN
 			cell.Value = header.Ar
 		}
 	}
-
 	for _, row := range data {
 		newRow := sheet.AddRow()
 		newRow.Sheet.SetColWidth(0, len(headers), 25)
@@ -57,8 +53,4 @@ func buildExcel(data [][]interface{}, headers []HeadersInfo, lang string, sheetN
 		}
 	}
 	return file
-}
-
-func PushFileToMiniO(file *xlsx.File) (string, error) {
-	return "", nil
 }
