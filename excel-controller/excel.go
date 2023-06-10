@@ -10,9 +10,7 @@ import (
 
 func CreateExcelFile(ctx *gin.Context) {
 	log.Println("----- CreateExcelFile ------")
-
-	var body map[string]interface{}
-
+	var body RequestBody
 	err := ctx.BindJSON(&body)
 	if err != nil {
 		log.Println(err)
@@ -20,9 +18,7 @@ func CreateExcelFile(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("body", body)
-	fmt.Println()
-
+	fmt.Println("====>", body.Lang, body.SheetName, body.Headers, body.Data, "<====")
 	ctx.JSON(200, gin.H{"message": "success"})
 
 	// buildExcelFile([][]interface{}{}, []HeadersInfo{}, "en", "sheetName")
@@ -39,9 +35,9 @@ func buildExcel(data [][]interface{}, headers []HeadersInfo, lang string, sheetN
 	for _, header := range headers {
 		cell := headerRow.AddCell()
 		if lang == "en" {
-			cell.Value = header.en
+			cell.Value = header.En
 		} else {
-			cell.Value = header.ar
+			cell.Value = header.Ar
 		}
 	}
 
