@@ -18,7 +18,14 @@ func CreateExcelFile(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("====>", body.Lang, body.SheetName, body.Headers, body.Data, "<====")
+	file := buildExcel(body.Data, body.Headers, body.Lang, body.SheetName)
+	err = file.Save(fmt.Sprintf("%s.xlsx", body.SheetName))
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
 	ctx.JSON(200, gin.H{"message": "success"})
 
 	// buildExcelFile([][]interface{}{}, []HeadersInfo{}, "en", "sheetName")
