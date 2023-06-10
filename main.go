@@ -17,6 +17,6 @@ func init() {
 }
 
 func main() {
-	server.POST("/api/excel", controller.CreateExcelFile)
+	server.POST("/api/excel/build", controller.CreateExcelFile)
 	log.Fatal(server.Run(":9197"))
 }

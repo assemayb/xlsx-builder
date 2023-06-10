@@ -8,22 +8,23 @@ import (
 	"github.com/tealeg/xlsx"
 )
 
-type HeadersInfo struct {
-	en string
-	ar string
-}
-
 func CreateExcelFile(ctx *gin.Context) {
-	log.Println("GenerateExcelData")
+	log.Println("----- CreateExcelFile ------")
+
 	var body map[string]interface{}
+
 	err := ctx.BindJSON(&body)
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+
 	fmt.Println("body", body)
+	fmt.Println()
+
 	ctx.JSON(200, gin.H{"message": "success"})
+
 	// buildExcelFile([][]interface{}{}, []HeadersInfo{}, "en", "sheetName")
 }
 
@@ -53,4 +54,8 @@ func buildExcel(data [][]interface{}, headers []HeadersInfo, lang string, sheetN
 		}
 	}
 	return file
+}
+
+func PushFileToMiniO(file *xlsx.File) (string, error) {
+	return "", nil
 }
