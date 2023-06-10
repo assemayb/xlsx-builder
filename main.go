@@ -25,9 +25,10 @@ func init() {
 
 	server = gin.New()
 	minioInstance, err = minioPackage.NewClient()
-
 	if err != nil {
 		log.Fatal(err)
+	} else {
+		log.Println("Minio client created successfully")
 	}
 
 	server.Use(gin.Logger(), gin.Recovery())

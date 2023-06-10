@@ -1,6 +1,7 @@
 package excelcontroller
 
 import (
+	minioPackage "excel-builder/minio"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,13 +20,14 @@ func CreateExcelFile(ctx *gin.Context) {
 	}
 
 	file := buildExcel(body.Data, body.Headers, body.Lang, body.SheetName)
-	err = file.Save(fmt.Sprintf("%s.xlsx", body.SheetName))
+	fileName, err := minioPackage.PushFileToMiniO(ctx, file)
 
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Println(fileName)
 	ctx.JSON(http.StatusCreated, gin.H{"message": "success"})
 }
 
