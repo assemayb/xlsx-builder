@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/joho/godotenv v1.5.1
 	github.com/minio/minio-go/v7 v7.0.56
 	github.com/tealeg/xlsx v1.0.5
 )
