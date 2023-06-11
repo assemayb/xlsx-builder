@@ -24,7 +24,7 @@ func init() {
 	}
 
 	server = gin.New()
-	minioInstance, err = minioPackage.NewClient()
+	minioInstance, err = minioPackage.SetMinioClientConnection()
 	if err != nil {
 		log.Fatal(err)
 	} else {

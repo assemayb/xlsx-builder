@@ -2,6 +2,7 @@ package minio
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os"
 	"sync"
@@ -13,58 +14,66 @@ import (
 )
 
 var (
-	client *minio.Client
-	once   sync.Once
+	lock           sync.Mutex
+	clientInstance *minio.Client
+	once           sync.Once
 )
 
-// ?? fix this
-func NewClient() (client *minio.Client, err error) {
+func SetMinioClientConnection() (client *minio.Client, err error) {
 	endpoint := os.Getenv("minio_endpoint")
 	accessKeyID := os.Getenv("minio_access_key")
 	secretAccessKey := os.Getenv("minio_secret_key")
 	once.Do(func() {
 		var error error
-		client, error = minio.New(endpoint, &minio.Options{
+		clientInstance, error = minio.New(endpoint, &minio.Options{
 			Secure:    false,
 			Transport: nil,
 			Creds:     credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		})
-
 		if error != nil {
-			fmt.Println(error)
+			fmt.Println("Error creating minio client")
+			panic(error)
 		}
 	})
 	return client, nil
 }
 
+func GetInstance() *minio.Client {
+	if clientInstance == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if clientInstance == nil {
+			var error error
+			clientInstance, error = SetMinioClientConnection()
+			if error != nil {
+				fmt.Println("Error creating minio client")
+				panic(error)
+			}
+		}
+	}
+	return clientInstance
+}
+
 func PushFileToMiniO(ctx *gin.Context, file *xlsx.File) (string, error) {
+	context := context.Background()
+	bucketName := "excel"
+	objectName := "myObject"
+	contentType := "application/octet-stream"
 
-	fmt.Println("  ------->>  Pushing file to minio  <<-------  ")
-	// context := context.Background()
 	var err error
-	var bucketName = "excel"
-	var objectName = "myObject"
-	var contentType = "application/octet-stream"
-
 	var fileBuffer = new(bytes.Buffer)
 	err = file.Write(fileBuffer)
 	if err != nil {
 		fmt.Println("Error Writing file data to a buffer", err)
 		panic(err)
-
 	}
-
 	reader := bytes.NewReader(fileBuffer.Bytes())
 	fileSize := int64(fileBuffer.Len())
 
-	clientInstance, err := NewClient()
-	if err != nil {
-		fmt.Println("Error creating minio client")
-		fmt.Println(err)
-	}
-	fmt.Println(clientInstance.IsOnline())
+	clientInstance := GetInstance()
+	fmt.Println(clientInstance.BucketExists(ctx, bucketName))
 	fileInfo, err := clientInstance.PutObject(
-		ctx,
+		context,
 		bucketName,
 		objectName,
 		reader,
