@@ -70,9 +70,7 @@ func PushFileToMiniO(ctx *gin.Context, file *xlsx.File) (string, error) {
 	reader := bytes.NewReader(fileBuffer.Bytes())
 	fileSize := int64(fileBuffer.Len())
 
-	clientInstance := GetInstance()
-	fmt.Println(clientInstance.BucketExists(ctx, bucketName))
-	fileInfo, err := clientInstance.PutObject(
+	fileInfo, err := GetInstance().PutObject(
 		context,
 		bucketName,
 		objectName,
@@ -80,9 +78,7 @@ func PushFileToMiniO(ctx *gin.Context, file *xlsx.File) (string, error) {
 		fileSize,
 		minio.PutObjectOptions{ContentType: contentType},
 	)
-
 	if err != nil {
-		fmt.Println("Error uploading file to minio")
 		fmt.Println(err)
 	}
 	return fileInfo.Key, nil
