@@ -4,9 +4,9 @@ import (
 	controller "excel-builder/excel-controller"
 	minioPackage "excel-builder/minio"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -14,14 +14,11 @@ var (
 )
 
 func init() {
-	var err error
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
+	var endpoint = os.Getenv("minio_endpoint")
+	var accessKeyID = os.Getenv("minio_access_key")
+	var secretAccessKey = os.Getenv("minio_secret_key")
 	server = gin.New()
-	_, err = minioPackage.SetMinioClientConnection()
+	_, err := minioPackage.SetMinioClientConnection(endpoint, accessKeyID, secretAccessKey)
 	if err != nil {
 		log.Fatal("Minio Error", err)
 	}

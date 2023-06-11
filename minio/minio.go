@@ -19,10 +19,7 @@ var (
 	once           sync.Once
 )
 
-func SetMinioClientConnection() (client *minio.Client, err error) {
-	endpoint := os.Getenv("minio_endpoint")
-	accessKeyID := os.Getenv("minio_access_key")
-	secretAccessKey := os.Getenv("minio_secret_key")
+func SetMinioClientConnection(endpoint, accessKeyID, secretAccessKey string) (client *minio.Client, err error) {
 	once.Do(func() {
 		var error error
 		clientInstance, error = minio.New(endpoint, &minio.Options{
@@ -44,7 +41,10 @@ func GetInstance() *minio.Client {
 		defer lock.Unlock()
 		if clientInstance == nil {
 			var error error
-			clientInstance, error = SetMinioClientConnection()
+			endpoint := os.Getenv("minio_endpoint")
+			accessKeyID := os.Getenv("minio_access_key")
+			secretAccessKey := os.Getenv("minio_secret_key")
+			clientInstance, error = SetMinioClientConnection(endpoint, accessKeyID, secretAccessKey)
 			if error != nil {
 				fmt.Println("Error creating minio client")
 				panic(error)
