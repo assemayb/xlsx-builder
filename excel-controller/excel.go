@@ -20,14 +20,14 @@ func CreateExcelFile(ctx *gin.Context) {
 	}
 
 	file := buildExcel(body.Data, body.Headers, body.Lang, body.SheetName)
-	fileName, err := minioPackage.PushFileToMiniO(file)
+	fileName, err := minioPackage.PushFileToMiniO(ctx, file)
 
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(fileName)
+	fmt.Println("File name: ", fileName)
 	ctx.JSON(http.StatusCreated, gin.H{"message": "success"})
 }
 
