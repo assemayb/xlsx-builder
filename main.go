@@ -7,16 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/minio/minio-go/v7"
 )
 
 var (
-	server        *gin.Engine
-	minioInstance *minio.Client
+	server *gin.Engine
 )
 
 func init() {
-
 	var err error
 	err = godotenv.Load()
 	if err != nil {
@@ -24,13 +21,10 @@ func init() {
 	}
 
 	server = gin.New()
-	minioInstance, err = minioPackage.SetMinioClientConnection()
+	_, err = minioPackage.SetMinioClientConnection()
 	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Println("Minio client created successfully")
+		log.Fatal("Minio Error", err)
 	}
-
 	server.Use(gin.Logger(), gin.Recovery())
 }
 
