@@ -26,6 +26,12 @@ func init() {
 }
 
 func main() {
+	server.GET("/ping", func(ctx *gin.Context) {
+		ctx.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
 	server.POST("/api/excel/build", controller.CreateExcelFile)
-	log.Fatal(server.Run(":9197"))
+	log.Fatal(server.Run(":9107"))
+	gin.SetMode(gin.ReleaseMode)
 }
