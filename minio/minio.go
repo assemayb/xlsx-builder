@@ -54,10 +54,10 @@ func GetInstance() *minio.Client {
 	return clientInstance
 }
 
-func PushFileToMiniO(ctx *gin.Context, file *xlsx.File) (string, error) {
+func PushFileToMiniO(ctx *gin.Context, file *xlsx.File) (minio.UploadInfo, error) {
 	context := context.Background()
 	bucketName := "excel"
-	objectName := "myObject"
+	objectName := "myObject.xlsx"
 	contentType := "application/octet-stream"
 
 	var err error
@@ -81,5 +81,5 @@ func PushFileToMiniO(ctx *gin.Context, file *xlsx.File) (string, error) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	return fileInfo.Key, nil
+	return fileInfo, nil
 }

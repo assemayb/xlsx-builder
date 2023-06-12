@@ -2,7 +2,6 @@ package excelcontroller
 
 import (
 	minioPackage "excel-builder/minio"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -20,15 +19,15 @@ func CreateExcelFile(ctx *gin.Context) {
 	}
 
 	file := buildExcel(body.Data, body.Headers, body.Lang, body.SheetName)
-	fileName, err := minioPackage.PushFileToMiniO(ctx, file)
+	fileInfo, err := minioPackage.PushFileToMiniO(ctx, file)
 
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println("File name: ", fileName)
-	ctx.JSON(http.StatusCreated, gin.H{"message": "success"})
+
+	ctx.JSON(http.StatusCreated, gin.H{"fileInfo": fileInfo})
 }
 
 func buildExcel(data [][]interface{}, headers []HeadersInfo, lang string, sheetName string) *xlsx.File {
